@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>저온물류 관리자</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <style>
+      body { font-family: sans-serif; margin: 0; padding: 0; background: #f4f6f8; }
+      .admin-container { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+      .tabs { display: flex; gap: 10px; border-bottom: 2px solid #e5e7eb; margin-bottom: 20px; }
+      .tab { padding: 12px 24px; background: none; border: none; font-size: 16px; cursor: pointer; border-bottom: 3px solid transparent; }
+      .tab.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: bold; }
+      .live-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+      .live-badge { background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 20px; font-size: 14px; }
+      .live-pulse { color: #dc2626; font-size: 14px; animation: pulse 1.5s infinite; }
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+      table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+      th, td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+      th { background: #f9fafb; font-weight: 600; }
+      tr:hover { background: #f9fafb; }
+      input, select, button { padding: 8px 12px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 6px; }
+      button { background: #2563eb; color: white; border: none; cursor: pointer; }
+      button:hover { background: #1d4ed8; }
+      .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- 로그인 화면 -->
+<div id="login-box" class="admin-container" style="max-width: 400px;">
+    <h2>🔐 관리자 로그인</h2>
+    <input type="password" id="admin-pw" placeholder="비밀번호" style="width: 100%; margin-bottom: 10px;">
+    <button onclick="checkPassword()" style="width: 100%;">로그인</button>
+    <p id="pw-error" style="color: red; display: none;">비밀번호가 틀렸습니다.</p>
+</div>
+
+<!-- 관리자 대시보드 -->
+<div id="dashboard" class="admin-container" style="display: none;">
+    <h1>🚛 저온물류 관리자 대시보드</h1>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('list')">📋 운행 목록</button>
+        <button class="tab" onclick="switchTab('live')">🗺️ 실시간 추적</button>
+    </div>
+
+    <!-- 탭 1: 운행 목록 -->
+    <div id="tab-list">
+        <div class="filter-bar">
+            <input type="date" id="filter-date">
+            <input type="text" id="filter-vehicle" placeholder="차량번호 검색">
+            <select id="filter-status">
+                <option value="">전체 상태</option>
+                <option value="ongoing">운행중</option>
+                <option value="completed">완료</option>
+            </select>
+            <button onclick="loadTrips()">조회</button>
+        </div>
+        <table id="trip-table">
+            <thead>
+                <tr>
+                    <th>날짜</th><th>차량</th><th>기사</th><th>회전</th>
+                    <th>시작</th><th>종료</th><th>상태</th><th>사진</th>
+                </tr>
+            </thead>
+            <tbody id="trip-body"></tbody>
+        </table>
+    </div>
+
+    <!-- 탭 2: 실시간 추적 -->
+    <div id="tab-live" style="display: none;">
+        <div class="live-header">
+            <h2 style="margin: 0;">🗺️ 실시간 차량 위치</h2>
+            <span class="live-badge">운행 중: <span id="live-count">0</span>대</span>
+            <span class="live-pulse">🔴 LIVE (5초 갱신)</span>
+        </div>
+        <div id="live-map" style="height: 600px; border-radius: 12px;"></div>
+        <p style="color: #6b7280; font-size: 13px;">🔵 정상 (5분 내) | 🔴 지연 (5분 이상)</p>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

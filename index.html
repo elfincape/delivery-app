@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>저온 물류 기사 앱</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="login-section" class="container">
+    <h2>차량 정보 등록 (최초 1회)</h2>
+    <input type="text" id="reg-vehicle" placeholder="차량번호 (예: 12가3456)">
+    <input type="text" id="reg-name" placeholder="기사 이름">
+    <input type="tel" id="reg-phone" placeholder="전화번호">
+    <button onclick="registerDriver()">등록 후 시작</button>
+</div>
+
+<div id="app-section" class="container" style="display:none;">
+    <h2>오늘의 운행</h2>
+    <div class="info-box">
+        <p>차량: <span id="display-vehicle"></span></p>
+        <p>기사: <span id="display-name"></span></p>
+        <p id="rotation-hint" style="color:#2563eb;font-weight:bold;">오늘 운행 현황 확인 중...</p>
+    </div>
+
+    <button id="btn-start" class="btn-start" onclick="startTrip()">🚚 운행 시작</button>
+
+    <div id="action-section" style="display:none;">
+        <div class="info-box current-trip-box">
+            <p>🟢 <b><span id="current-rotation"></span>회전 운행 중</b></p>
+            <p>시작: <span id="start-time-display"></span></p>
+        </div>
+
+        <h3>📸 사진 등록</h3>
+        <button class="btn-action" onclick="document.getElementById('upload-loading').click()">📦 상차 사진 (1장)</button>
+        <input type="file" id="upload-loading" accept="image/*" capture="environment" style="display:none;" onchange="handleFileUpload(this, 'loading')">
+
+        <button class="btn-action" onclick="document.getElementById('upload-tacho').click()">🌡️ 타코메타 사진 (1장)</button>
+        <input type="file" id="upload-tacho" accept="image/*" capture="environment" style="display:none;" onchange="handleFileUpload(this, 'tacho')">
+
+        <h3>📍 하차지 납품</h3>
+        <div class="delivery-box">
+            <input type="text" id="delivery-place" placeholder="하차지 명칭 입력">
+            <button class="btn-action" onclick="addDelivery()">하차지 도착 등록</button>
+            <button class="btn-action" onclick="document.getElementById('upload-delivery').click()">📦 납품 사진 (4면)</button>
+            <input type="file" id="upload-delivery" accept="image/*" capture="environment" multiple style="display:none;" onchange="handleFileUpload(this, 'delivery')">
+            <p id="current-delivery-info" style="color:#10b981; font-size:14px; margin-top:8px;"></p>
+        </div>
+
+        <hr>
+        <button class="btn-end" onclick="endTrip()">🛑 운행 종료</button>
+    </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
